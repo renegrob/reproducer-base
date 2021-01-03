@@ -5,25 +5,28 @@ plugins {
 
 repositories {
     mavenLocal()
+    maven {
+        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+
+    }
+    jcenter()
     mavenCentral()
 }
 
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
+val webAuthn4JVersion: String by project
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
-    implementation("io.quarkus:quarkus-hibernate-orm")
-    implementation("io.quarkus:quarkus-rest-client-jackson")
-    implementation("io.quarkus:quarkus-jdbc-h2")
-    implementation("io.quarkus:quarkus-rest-client")
+    implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-resteasy")
     implementation("io.quarkus:quarkus-resteasy-jackson")
-    implementation("io.quarkus:quarkus-spring-data-jpa")
-    implementation("io.quarkus:quarkus-resteasy-qute")
-    implementation("io.quarkus:quarkus-arc")
+
+    implementation("com.webauthn4j:webauthn4j-core:${webAuthn4JVersion}")
+
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
 }

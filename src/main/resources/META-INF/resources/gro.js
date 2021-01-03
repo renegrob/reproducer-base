@@ -2,23 +2,101 @@
 
 // https://auth.automatix:8443/
 
+
+// -------------
+
+  /*
+   * Base64URL-ArrayBuffer
+   * https://github.com/herrjemand/Base64URL-ArrayBuffer
+   *
+   * Copyright (c) 2017 Yuriy Ackermann <ackermann.yuriy@gmail.com>
+   * Copyright (c) 2012 Niklas von Hertzen
+   * Licensed under the MIT license.
+   */
+
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  // Use a lookup table to find the index.
+  const lookup = new Uint8Array(256);
+
+  for (var i = 0; i < chars.length; i++) {
+    lookup[chars.charCodeAt(i)] = i;
+  }
+
+  const bufferToBase64 = function (arraybuffer) {
+    const bytes = new Uint8Array(arraybuffer);
+
+    var len = bytes.length;
+    var base64url = '';
+
+    for (var i = 0; i < len; i += 3) {
+      base64url += chars[bytes[i] >> 2];
+      base64url += chars[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
+      base64url += chars[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
+      base64url += chars[bytes[i + 2] & 63];
+    }
+
+    if ((len % 3) === 2) {
+      base64url = base64url.substring(0, base64url.length - 1);
+    } else if (len % 3 === 1) {
+      base64url = base64url.substring(0, base64url.length - 2);
+    }
+
+    return base64url;
+  }
+
+  const base64ToBuffer = function (base64string) {
+    if (base64string) {
+
+      var bufferLength = base64string.length * 0.75;
+
+      var len = base64string.length;
+      var p = 0;
+
+      var encoded1;
+      var encoded2;
+      var encoded3;
+      var encoded4;
+
+      let bytes = new Uint8Array(bufferLength);
+
+      for (var i = 0; i < len; i += 4) {
+        encoded1 = lookup[base64string.charCodeAt(i)];
+        encoded2 = lookup[base64string.charCodeAt(i + 1)];
+        encoded3 = lookup[base64string.charCodeAt(i + 2)];
+        encoded4 = lookup[base64string.charCodeAt(i + 3)];
+
+        bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
+        bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
+        bytes[p++] = ((encoded3 & 3) << 6) | (encoded4 & 63);
+      }
+
+      return bytes.buffer;
+    }
+  }
+
+  // ------------------
+
+
 function checkCapabilities() {
     if (window.PublicKeyCredential) {
        // code here
        console.log("use public-key credentials");
-    }else{
+
+       PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(
+          function() {
+              console.log("User verifying platform available");
+          }
+       );
+
+    } else {
        alert("public-key credentials not supported");
     }
-
-    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(
-       function() {
-           console.log("User verifying platform available");
-       }
-    );
 }
 
-function register() {
+function register(options, callback) {
     // checkCapabilities();
+
+    console.log("options: " + JSON.stringify(options, null, 2));
 
     // https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialcreationoptions
     var publicKeyOptions = {
@@ -26,22 +104,21 @@ function register() {
       // Relying Party:
       rp: {
         name: "The Secure Page",
-        id: "auth.automatix"
+        id: "auth.automatix"  // domain of the site or parent domain (top level not allowed)
       },
 
       // User:
       user: {
-        //id: Uint8Array.from(window.atob("MIIBkzCCATigAwIBAjCCAZMwggE4oAMCAQIwggGTMII="), c=>c.charCodeAt(0)),
-        id : new Uint8Array([11,31,105,21,31,103,21,31,105,21,1,2,4,5,6,7]),
-//        name: "alex.mueller@example.com",
-//        displayName: "Alex Müller",
-        name: "johndoe",
-        displayName: "Jonny",
+        // id : new Uint8Array([11,31,105,21,31,103,21,31,105,21,1,2,4,5,6,7]),
+        // name: "alex.mueller@example.com",
+        // displayName: "Alex Müller",
+        id: base64ToBuffer(options.user.id),
+        name: options.user.name,
+        displayName: options.user.fullName,
       },
 
-      // The challenge is produced by the server; see the Security Considerations (this challenge is very short!)
-      challenge: new Uint8Array([21,31,105,21,31,105,21,31,105,21,31,105,21,31,105,99,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0]),
-
+      // The challenge is produced by the server; see the Security Considerations
+      challenge: base64ToBuffer(options.challenge),
 
       // This Relying Party will accept either an ES256 or RS256 credential, but
       // prefers an ES256 credential.
@@ -64,14 +141,14 @@ function register() {
         {type: "public-key", alg: -39},
         {type: "public-key", alg: -8}
       ],
-/*
       authenticatorSelection: {
         // Try to use UV if possible. This is also the default. (e.g. Key needs to be touched)
-        userVerification: "required",
+        userVerification: options.userVerification,
         // client-side discoverable credential (vs server-side generated key)
-        residentKey: "required",
-        requireResidentKey: true
+//        residentKey: "required",
+        requireResidentKey: options.residentKey
       },
+
 
       // authenticatorSelection: {authenticatorAttachment: "cross-platform", requireResidentKey: true, userVerification: "required"}
 
@@ -86,14 +163,18 @@ function register() {
       ],
       */
       //attestation: "direct",  // requires user's consent
-      attestation: "none"
+
+      attestation: options.attestation,
 
       // Make excludeCredentials check backwards compatible with credentials registered with U2F
       //extensions: {"appidExclude": "https://acme.example.com"}
       // extensions: {txAuthSimple: ""}
+      // https://www.w3.org/2019/01/webauthn-extensions.html
+      extensions: options.extensions
     };
 
-    console.log("PublicKeyCredentialCreationOptions: " + JSON.stringify(publicKeyOptions))
+    console.log("PublicKeyCredentialCreationOptions: " + JSON.stringify(publicKeyOptions, null, 2));
+    console.log(publicKeyOptions);
 
     // Note: The following call will cause the authenticator to display UI.
     navigator.credentials.create({ "publicKey": publicKeyOptions })
@@ -103,99 +184,81 @@ function register() {
         console.log("new credentials: ")
         console.log(newCredentialInfo);
         console.log(newCredentialInfo.id);
-        console.log(newCredentialInfo.rawId);
+        console.log(bufferToBase64(newCredentialInfo.rawId));
+        var credential = {
+            "id": newCredentialInfo.id,
+            "response": {
+                "attestationObject": bufferToBase64(newCredentialInfo.response.attestationObject),
+                "clientDataJSON": bufferToBase64(newCredentialInfo.response.clientDataJSON)
+            }
+        }
+        if (newCredentialInfo.getClientExtensionResults !== undefined) {
+            console.log("getClientExtensionResults: ")
+            console.log(newCredentialInfo.getClientExtensionResults());
+        }
+        callback(credential);
       }
       ).catch(function (err) {
         // No acceptable authenticator or user refused consent. Handle appropriately.
         alert(err);
       });
-
 }
 
-function login() {
+
+function login(options, callback) {
 
     // checkCapabilities();
-
-    const base64Id = "KmpcXOUmS5ddq2nFBF25NSV5RIqheOK7gJmmhBKLq4m_4caGLaaRzbwvE65Pv3Y6r8_p5UPr_7OzJMVlg2ekaHCGPYufGNPT5Z66UJKI4ir4ag7BpTHqyCkVWZ2DfLix";
-    var challengeBuffer = new Uint8Array([21,31,105,21,31,105,21,31,105,21,31,105,21,31,105,99,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,50]);
-    //var idBuffer = Uint8Array.from(atob(base64Id), c => c.charCodeAt(0));
-    // var idBuffer = Base64Binary.decodeArrayBuffer(base64Id);
-    var idBuffer = new Uint8Array([42, 106, 92, 92, -27, 38, 75, -105, 93, -85, 105, -59, 4, 93, -71, 53, 37, 121, 68, -118, -95, 120, -30, -69, -128, -103, -90, -124, 18, -117, -85, -119, -65, -31, -58, -122, 45, -90, -111, -51, -68, 47, 19, -82, 79, -65, 118, 58, -81, -49, -23, -27, 67, -21, -1, -77, -77, 36, -59, 101, -125, 103, -92, 104, 112, -122, 61, -117, -97, 24, -45, -45, -27, -98, -70, 80, -110, -120, -30, 42, -8, 106, 14, -63, -91, 49, -22, -56, 41, 21, 89, -99, -125, 124, -72, -79]);
-
     // navigator.credentials.preventSilentAccess();
 
-    const publicKeyCredentialRequestOptions = {
-        challenge: challengeBuffer,
-        allowCredentials: [{
-            type: 'public-key',
-            id : idBuffer,
-            transports: [   "usb",
-                                "nfc",
-                                "ble",
-                                "internal"],
-        }],
-        userVerification: "preferred",  // use "required"
-        /*
-      authenticatorSelection: {
-        // Try to use UV if possible. This is also the default.
-        userVerification: "required"
-      },*/
-      //  timeout: 60000,
+    console.log("options: " + JSON.stringify(options, null, 2));
+
+    var publicKeyCredentialRequestOptions;
+    if (options.allowCredentials !== undefined) {
+        options.allowCredentials.forEach(function (listItem) {
+            listItem.id = base64ToBuffer(listItem.id)
+        });
+        publicKeyCredentialRequestOptions = {
+            challenge: base64ToBuffer(options.challenge),
+            allowCredentials: options.allowCredentials,
+            userVerification: options.userVerification,
+            extensions: options.extensions
+          //  timeout: 60000,
+        };
+    } else  {
+        publicKeyCredentialRequestOptions = {
+            challenge: base64ToBuffer(options.challenge),
+            userVerification: options.userVerification,
+            extensions: options.extensions
+          //  timeout: 60000,
+        };
     }
-    /*
-    const assertion = await navigator.credentials.get({
-        publicKey: publicKeyCredentialRequestOptions
-    });
-    */
 
     console.log("publicKeyCredentialRequestOptions: ")
     console.log(publicKeyCredentialRequestOptions);
 
-    navigator.credentials.get({ "publicKey": publicKeyCredentialRequestOptions })
+    navigator.credentials.get({ "publicKey": publicKeyCredentialRequestOptions, "mediation": "optional" })
       .then(
       function (credential) {
         // Send new credential info to server for verification and registration.
         console.log("credential: ")
         console.log(credential);
+        var assertion = {
+            "id": credential.id,
+            "response": {
+                "authenticatorData": bufferToBase64(credential.response.authenticatorData),
+                "clientDataJSON": bufferToBase64(credential.response.clientDataJSON),
+                "signature":  bufferToBase64(credential.response.signature),
+                "userHandle": bufferToBase64(credential.response.userHandle),
+            }
+        }
+        console.log("assertion: " + JSON.stringify(assertion, null, 2));
+        if (credential.getClientExtensionResults !== undefined) {
+            console.log("getClientExtensionResults: ")
+            console.log(credential.getClientExtensionResults());
+        }
+        callback(assertion);
       }
-      );
-
-/*
-    navigator.credentials.get({
-        publicKey: {
-            challenge: challengeBuffer,
-            userVerification: "required"
-        },
-    })
-    .then(
-      function (credential) {
-        // Send new credential info to server for verification and registration.
-        console.log("credential: ")
-        console.log(credential);
-      }
-    );
-    */
+    ).catch(function (err) {
+             alert(err);
+           });
 }
-
-/*
-publicKey:
-attestation: "direct"
-authenticatorSelection: {authenticatorAttachment: "cross-platform", requireResidentKey: true, userVerification: "required"}
-challenge: Uint8Array(32) [206, 28, 246, 204, 100, 152, 219, 25, 153, 104, 41, 106, 209, 120, 227, 89, 158, 147, 37, 44, 38, 11, 135, 151, 245, 20, 238, 10, 173, 3, 73, 102]
-pubKeyCredParams: (10) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
-0: {type: "public-key", alg: -7}
-1: {type: "public-key", alg: -35}
-2: {type: "public-key", alg: -36}
-3: {type: "public-key", alg: -257}
-4: {type: "public-key", alg: -258}
-5: {type: "public-key", alg: -259}
-6: {type: "public-key", alg: -37}
-7: {type: "public-key", alg: -38}
-8: {type: "public-key", alg: -39}
-9: {type: "public-key", alg: -8}
-rp: {name: "webauthn.io", id: "webauthn.io"}
-timeout: 60000
-user: {name: "john-doe", displayName: "john-doe", id: Uint8Array(10)}
-__proto__: Object
-__proto__: Object
-*/

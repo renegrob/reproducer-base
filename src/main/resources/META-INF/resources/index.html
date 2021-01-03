@@ -2,18 +2,120 @@
 <html>
 	<head>
 		<title>WebAuthn</title>
-		<script src="base64-binary.js"></script>
-		<script src="gro.js"></script>
+<!--		<script type="text/javascript" src="base64url-arraybuffer.js"></script>-->
+		<script type="text/javascript" src="gro.js"></script>
+		<script>
+			function str2FakeId(str) {
+			    var bytes = new Uint8Array(str.length);
+			    for (var i = 0; i < str.length; i++) {
+			      bytes[i] = str.charCodeAt(i) & 255; // only for testing purposes
+			    }
+			    return bufferToBase64(bytes.buffer);
+			}
+		
+			function registerCallback(credentialInfo) {
+				document.getElementById("credentialId").value = credentialInfo.id;
+				alert("Registered as: " + JSON.stringify(credentialInfo, null, 2));
+			}
+		
+			function doRegister() {
+				const userName = document.getElementById("userName").value;
+				const fullName = document.getElementById("fullName").value;
+				const residentKey = document.getElementById("residentKey").checked;
+				const fakeId = str2FakeId(userName);  // Don't do this in production! Use a proper ID there!
+				const fakeChallenge = bufferToBase64(new Uint8Array([21,31,105,21,31,105,21,31,105,21,31,105,21,31,105,99,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,50]));
+				var options;
+				if (residentKey == true) {
+					options = {
+						"challenge": fakeChallenge,
+						"user": {
+							"id": fakeId,
+							"name": userName,
+							"fullName": fullName
+						},
+						"residentKey": true, // Level-1
+						"userVerification": "required",
+						"attestation": "none",
+						// https://www.w3.org/2019/01/webauthn-extensions.html
+						"extensions": { "mvn": "true" }
+					};
+				} else {
+					options = {
+						"challenge": fakeChallenge,
+						"user": {
+							"id": fakeId,
+							"name": userName,
+							"fullName": fullName
+						},
+						"userVerification": "preferred",
+						"attestation": "none"
+						//"extensions": { "mvn": "true" }
+					};
+				}
+				register(options, registerCallback);
+			}
+			
+			function loginCallback(credentialInfo) {
+				alert("Logged in as: " + JSON.stringify(credentialInfo, null, 2));
+			}
+		
+			function doLogin() {
+				const credentialId =  document.getElementById("credentialId").value;
+				const residentKey = document.getElementById("residentKey").checked;
+				const fakeChallenge = bufferToBase64(new Uint8Array([21,31,105,21,31,105,21,31,105,21,31,105,21,31,105,99,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,50]));
+				var options;
+				if (residentKey == true) {
+					options = {
+					    "challenge": fakeChallenge,
+				        "userVerification": "required"
+					};
+				} else {
+					options = {
+					    "challenge": fakeChallenge,
+				        "allowCredentials": [{
+				            "type": "public-key",
+				            "id" : credentialId,
+				            "transports": [ "usb",
+				                                "nfc",
+				                                "ble",
+				                                "internal"],
+				        }],
+				        "userVerification": "required"
+					};
+				}
+				login(options, loginCallback);
+			}
+		</script>
 	</head>
 	<body>
 		<h1>
 			WebAuthn Test Page
 		</h1>
 		<p>
-			<button name="register" type="button" onclick="register()">Register</button>
+			<form name="user-details">
+				<p>
+					<label for="userName">User name</label>
+					<input id="userName" name="userName" type="text" value="johndoe@john.doe" />
+				</p>
+				<p>
+					<label for="fullName">Full name</label>
+					<input id="fullName" name="fullName" type="text" value="Jonny Doe" />
+				</p>
+				<p>
+					<label for="credentialId">Credential ID</label>
+					<input id="credentialId" name="credentialId" type="text" value="" />
+				</p>
+				<p>
+					<label for="residentKey">Resident Key</label>
+					<input id="residentKey" name="residentKey" type="checkbox" />
+				</p>
+			</form>
 		</p>
 		<p>
-			<button name="login" type="button" onclick="login()">Login</button>
+			<button name="register" type="button" onclick="doRegister()">Register</button>
+		</p>
+		<p>
+			<button name="login" type="button" onclick="doLogin()">Login</button>
 		</p>
 	</body>
 </html>
