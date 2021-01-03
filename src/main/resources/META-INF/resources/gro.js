@@ -248,6 +248,7 @@ function login(options, callback) {
                 "authenticatorData": bufferToBase64(credential.response.authenticatorData),
                 "clientDataJSON": bufferToBase64(credential.response.clientDataJSON),
                 "signature":  bufferToBase64(credential.response.signature),
+                // userHandle is only set for residentKeys
                 "userHandle": bufferToBase64(credential.response.userHandle),
             }
         }
