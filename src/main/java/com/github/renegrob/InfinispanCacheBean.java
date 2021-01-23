@@ -1,9 +1,11 @@
 package com.github.renegrob;
 
+import java.io.IOException;
 import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
 
 import org.infinispan.Cache;
+import org.infinispan.commons.api.CacheContainerAdmin;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.StorageType;
@@ -20,23 +22,24 @@ public class InfinispanCacheBean {
     private Cache<Object, Object> myCache;
 
     @PostConstruct
-    public void startup() {
-        // https://infinispan.org/docs/10.0.x/titles/embedding/embedding.html#using_infinispan_as_an_embedded_data_grid_in_java_se
-        /*
-        GlobalConfiguration globalConfig = new GlobalConfigurationBuilder().transport()
-                .defaultTransport()
-                .clusterName("dev-cluster")
-                .addProperty("configurationFile", "default-jgroups-tcp.xml")
-                .build();
+    public void startup() throws IOException {
+        // https://github.com/infinispan/infinispan-embedded-tutorial
+//        GlobalConfiguration globalConfig = new GlobalConfigurationBuilder().transport()
+//                .defaultTransport()
+//                .clusterName("dev-cluster")
+//                .addProperty("configurationFile", "default-jgroups-tcp.xml")
+//                .build();
+
+
 
         // TODO: Configuring Cluster Transport with Asymmetric Encryption
-        cacheManager = new DefaultCacheManager(globalConfig);
+        //cacheManager = new DefaultCacheManager(globalConfig);
+        cacheManager = new DefaultCacheManager(InfinispanCacheBean.class.getResourceAsStream("/infinispan.xml"));
 
-         */
-        cacheManager = new DefaultCacheManager();
+        // cacheManager = new DefaultCacheManager();
         ConfigurationBuilder builder = new ConfigurationBuilder();
-        builder.clustering().cacheMode(CacheMode.REPL_SYNC).memory().storage(StorageType.HEAP).maxSize("500M");
-        myCache = cacheManager.administration().getOrCreateCache("myCache", builder.build());
+        builder.clustering().cacheMode(CacheMode.REPL_SYNC); // .memory().storage(StorageType.HEAP).maxSize("500M");
+        myCache = cacheManager.administration().withFlags(CacheContainerAdmin.AdminFlag.VOLATILE).getOrCreateCache("myCache", builder.build());
     }
 
     /*
