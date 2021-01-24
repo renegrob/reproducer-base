@@ -2,8 +2,10 @@ package com.github.renegrob;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -33,7 +35,10 @@ public class CacheResource {
     @Path("{key}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getByKey(@PathParam("key") String key) {
-        return String.valueOf(cacheBean.getMyCache().get(key));
+        if (!cacheBean.getMyCache().containsKey(key)) {
+            throw new NotFoundException();
+        }
+        return Objects.toString(cacheBean.getMyCache().get(key), null);
     }
 
     @POST
