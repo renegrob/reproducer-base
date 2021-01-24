@@ -26,65 +26,21 @@ public class InfinispanCacheBean {
 
     @PostConstruct
     public void startup() throws IOException {
-        // https://github.com/infinispan/infinispan-embedded-tutorial
-//        GlobalConfiguration globalConfig = new GlobalConfigurationBuilder().transport()
-//                .defaultTransport()
-//                .clusterName("dev-cluster")
-//                .addProperty("configurationFile", "default-jgroups-tcp.xml")
-//                .build();
 
         ConfigurationBuilder builder = new ConfigurationBuilder();
         builder.clustering()
                 .cacheMode(CacheMode.DIST_ASYNC)
                 .l1().lifespan(25000L)
-                .hash().numOwners(1)
+                .hash().numOwners(2)
                 .statistics().enable();
         Configuration cfg = builder.build();
 
         // TODO: Configuring Cluster Transport with Asymmetric Encryption
-        cacheManager = new DefaultCacheManager(new GlobalConfigurationBuilder().transport().defaultTransport().build());
-        //cacheManager = new DefaultCacheManager(InfinispanCacheBean.class.getResourceAsStream("/infinispan.xml"));
-
-        // cacheManager = new DefaultCacheManager();
-        //ConfigurationBuilder builder = new ConfigurationBuilder();
+        cacheManager = new DefaultCacheManager(new GlobalConfigurationBuilder().transport().defaultTransport().clusterName("myCluster").build());
         //builder.clustering().cacheMode(CacheMode.LOCAL); // .memory().storage(StorageType.HEAP).maxSize("500MB").whenFull(EvictionStrategy.REMOVE); // .memory().storage(StorageType.HEAP).maxSize("500M");
         myCache = cacheManager.administration().withFlags(CacheContainerAdmin.AdminFlag.VOLATILE).getOrCreateCache("myCache", cfg);
 
     }
-
-    private EmbeddedCacheManager container() {
-        return new DefaultCacheManager(
-                new GlobalConfigurationBuilder().transport().defaultTransport().build(),
-                new ConfigurationBuilder().clustering().stateTransfer().awaitInitialTransfer(false).build());
-    }
-
-
-    /*
-    @Produces
-    public Configuration defaultEmbeddedConfiguration () {
-        return new ConfigurationBuilder()
-                         .eviction()
-                                 .strategy(EvictionStrategy.LRU)
-                                 .maxEntries(100)
-                         .build();
-    }
-
-    	@Produces
-	@ApplicationScoped
-	public EmbeddedCacheManager defaultClusteredCacheManager() {
-		GlobalConfiguration g = new GlobalConfigurationBuilder()
-				.clusteredDefault()
-				.transport()
-				.clusterName("InfinispanCluster")
-				.build();
-		Configuration cfg = new ConfigurationBuilder()
-				.eviction()
-				.strategy(EvictionStrategy.LRU)
-				.maxEntries(150)
-				.build();
-		return new DefaultCacheManager(g, cfg);
-	}
-     */
 
     public DefaultCacheManager getCacheManager() {
         return cacheManager;
