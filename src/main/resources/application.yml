@@ -1,5 +1,12 @@
-display:
-  mach: 3
-  unit:
-    name: "mph"
-    factor: 2.23694
+quarkus:
+  http:
+    insecure-requests: redirect
+    host: 0.0.0.0
+    port: 8080
+    ssl-port: 8443
+    http2: true
+    ssl:
+      certificate:
+        key-store-file-type: PKCS12
+        key-store-file: tls-server-keypair.p12
+        key-store-password: 123456

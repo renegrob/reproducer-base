@@ -1,4 +1,4 @@
-# reproducer-base project
+# Reproducer project for https://github.com/quarkusio/quarkus/issues/14811
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
