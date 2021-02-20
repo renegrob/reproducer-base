@@ -2,6 +2,8 @@ package com.github.renegrob.config;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -10,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 @Path("/config")
+@Singleton
 public class ConfigResource {
 
     @ConfigProperty(name = "constant.speed-of-sound-in-meter-per-second", defaultValue = "343")

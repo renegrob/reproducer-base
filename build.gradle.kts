@@ -40,3 +40,33 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.add("-parameters")
 }
+
+tasks.register<DefaultTask>("quarkusRunConfig") {
+    if (!file("${project.buildDir}/quarkus-app/quarkus-run.jar").exists()) {
+        logger.lifecycle("quarkus-run.jar not found, triggering build.")
+        dependsOn(tasks.getByName("build"));
+    }
+
+    doFirst {
+        mkdir("${project.buildDir}/quarkus-app/config");
+        file("${project.buildDir}/quarkus-app/config/application.yml").writeText(
+                """
+display:
+  mach: 1
+  unit:
+    name: "km/h"
+    factor: 1234.8
+fix:
+  value: THIS_SHOULD_NOT_BE_VISIBLE    
+                     """
+        )
+    }
+}
+
+tasks.register<Exec>("quarkusRun") {
+    dependsOn("quarkusRunConfig")
+    workingDir = file("${project.buildDir}/quarkus-app");
+    commandLine = listOf("java", "-jar", "quarkus-run.jar")
+    standardOutput = System.out
+    errorOutput = System.err
+}

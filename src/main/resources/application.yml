@@ -3,3 +3,10 @@ display:
   unit:
     name: "mph"
     factor: 2.23694
+quarkus:
+  configuration:
+    build-time-mismatch-at-runtime: fail
+  package:
+    type: fast-jar
+  log:
+    level: INFO
