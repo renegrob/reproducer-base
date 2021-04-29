@@ -18,12 +18,9 @@ dependencies {
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-resteasy")
     implementation("io.quarkus:quarkus-resteasy-jackson")
-    //implementation("io.quarkus:quarkus-resteasy-qute")
-    //implementation("io.quarkus:quarkus-rest-client")
-    //implementation("io.quarkus:quarkus-rest-client-jackson")
+    implementation("io.quarkus:quarkus-security")
     //implementation("io.quarkus:quarkus-jdbc-h2")
     //implementation("io.quarkus:quarkus-hibernate-orm")
-    //implementation("io.quarkus:quarkus-spring-data-jpa")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
 }

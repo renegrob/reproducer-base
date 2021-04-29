@@ -1,5 +1,9 @@
-display:
-  mach: 3
-  unit:
-    name: "mph"
-    factor: 2.23694
+quarkus:
+  http:
+    auth:
+      proactive: true
+      basic: true
+      realm: 'MY REALM'
+  log:
+    min-level: TRACE
+    level: INFO

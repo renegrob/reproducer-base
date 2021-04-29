@@ -11,7 +11,7 @@ public class GreetingResourceTest {
 
     @Test
     public void testHelloEndpoint() {
-        given()
+        given().auth().basic("john.doe", "s3cr3t").header("X-Tenant", "Quarkus-Tenant")
           .when().get("/hello-resteasy")
           .then()
              .statusCode(200)
