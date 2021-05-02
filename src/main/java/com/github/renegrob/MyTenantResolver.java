@@ -1,20 +1,17 @@
 package com.github.renegrob;
 
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 
-import io.vertx.core.Vertx;
+import io.vertx.ext.web.RoutingContext;
 
 @RequestScoped
 public class MyTenantResolver {
 
-    private String tenant;
-
-    void setTenant(String tenant) {
-        this.tenant = tenant;
-    }
+    @Inject
+    RoutingContext routingContext;
 
     public String resolveTenant() {
-        //return Vertx.currentContext().get("tenant");
-        return tenant;
+        return routingContext.request().getHeader("X-Tenant");
     }
 }

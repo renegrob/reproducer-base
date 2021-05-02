@@ -8,28 +8,21 @@ import javax.inject.Inject;
 import org.jboss.logging.Logger;
 
 import io.quarkus.arc.Arc;
+import io.quarkus.arc.InjectableContext;
 import io.quarkus.security.AuthenticationFailedException;
 import io.quarkus.security.identity.AuthenticationRequestContext;
 import io.quarkus.security.identity.IdentityProvider;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.quarkus.security.runtime.QuarkusSecurityIdentity;
 import io.smallrye.mutiny.Uni;
-import io.vertx.ext.web.RoutingContext;
 
 @ApplicationScoped
 public class MyIdentityProvider implements IdentityProvider<MyAuthenticationRequest> {
 
     private static final Logger LOG = Logger.getLogger(MethodHandles.lookup().lookupClass());
 
-    // does not work
-    //@Inject
-    //RoutingContext routingContext;
-
     @Inject
     MyService myService;
-
-    @Inject
-    MyTenantResolver tenantResolver;
 
     @Override
     public Class<MyAuthenticationRequest> getRequestType() {
@@ -39,31 +32,49 @@ public class MyIdentityProvider implements IdentityProvider<MyAuthenticationRequ
     @Override
     public Uni<SecurityIdentity> authenticate(MyAuthenticationRequest request,
             AuthenticationRequestContext context) {
-        RoutingContext routingContext = request.getAttribute(RoutingContext.class.getName());
-        final String tenant = routingContext.request().getHeader("X-Tenant");
-        LOG.info("Tenant outside runBlocking: " + tenant);  // works
-        // final InjectableContext.ContextState state = Arc.container().requestContext().getState(); // is also not active here, so we cannot take a snapshot
-        return context.runBlocking(new Supplier<SecurityIdentity>() {
+        context = fixedAuthenticationRequestContext(context);
+        return context.runBlocking(authenticateBlocking());
+    }
+
+    Supplier<SecurityIdentity> authenticateBlocking() {
+        return new Supplier<SecurityIdentity>() {
             @Override
             public SecurityIdentity get() {
                 try {
-                    final String tenant = routingContext.request().getHeader("X-Tenant");
-                    LOG.info("Tenant inside runBlocking: " + tenant);  // works
-                    // Vertx.currentContext().put("TENANT", tenant); // does not work
-                    Arc.container().requestContext().activate(null);
-                    try {
-                        tenantResolver.setTenant(tenant);
-                        final String result = myService.useTenant();
-                        LOG.info("MyService result: " + result);  // works
-                    }finally {
-                        Arc.container().requestContext().deactivate();
-                    }
+                    final String result = myService.useTenant();
+                    LOG.info("MyService result: " + result);  // works
                     return QuarkusSecurityIdentity.builder().setAnonymous(true).build();
                 } catch (SecurityException e) {
                     LOG.debug("Authentication failed", e);
                     throw new AuthenticationFailedException(e);
                 }
             }
-        });
+        };
     }
+
+    private AuthenticationRequestContext fixedAuthenticationRequestContext(final AuthenticationRequestContext originalContext) {
+        return new AuthenticationRequestContext() {
+            @Override
+            public Uni<SecurityIdentity> runBlocking(Supplier<SecurityIdentity> supplier) {
+                final InjectableContext.ContextState state = Arc.container().requestContext().getState();
+                return originalContext.runBlocking(supplierWithRequestContext(state, supplier));
+            }
+
+            private Supplier<SecurityIdentity> supplierWithRequestContext(InjectableContext.ContextState state, Supplier<SecurityIdentity> supplier) {
+                return new Supplier<SecurityIdentity>() {
+
+                    @Override
+                    public SecurityIdentity get() {
+                        Arc.container().requestContext().activate(state);
+                        try {
+                            return supplier.get();
+                        }finally {
+                            Arc.container().requestContext().deactivate();
+                        }
+                    }
+                };
+            }
+        };
+    }
+
 }

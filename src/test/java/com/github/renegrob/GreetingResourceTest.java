@@ -1,6 +1,10 @@
 package com.github.renegrob;
 
+import javax.inject.Inject;
+
 import io.quarkus.test.junit.QuarkusTest;
+import io.vertx.ext.web.RoutingContext;
+
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;

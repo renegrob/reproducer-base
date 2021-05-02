@@ -19,6 +19,7 @@ dependencies {
     implementation("io.quarkus:quarkus-resteasy")
     implementation("io.quarkus:quarkus-resteasy-jackson")
     implementation("io.quarkus:quarkus-security")
+    implementation("io.quarkus:quarkus-vertx-web")
     //implementation("io.quarkus:quarkus-jdbc-h2")
     //implementation("io.quarkus:quarkus-hibernate-orm")
     testImplementation("io.quarkus:quarkus-junit5")
