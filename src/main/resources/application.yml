@@ -1,5 +1,24 @@
-display:
-  mach: 3
-  unit:
-    name: "mph"
-    factor: 2.23694
+quarkus:
+  datasource:
+    db-kind: other
+    username: sa
+    #   password:
+    jdbc:
+      driver: 'org.hsqldb.jdbcDriver'
+      # DB path is relative to './build/classes/java/main'
+      url: 'jdbc:hsqldb:file:./../../../testDb'
+      # url: 'jdbc:hsqldb:mem:testDb'
+      initial-size: 2
+      min-size: 2
+      max-lifetime: 60M
+      max-size: 16
+      enable-metrics: true
+  hibernate-orm:
+    packages:
+      - 'com.github.renegrob.entity'
+    dialect: 'org.hibernate.dialect.HSQLDialect'
+    database:
+      generation: drop-and-create
+    second-level-caching-enabled: false
+  resteasy:
+    singleton-resources: true
