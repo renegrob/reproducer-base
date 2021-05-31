@@ -11,3 +11,6 @@ pluginManagement {
     }
 }
 rootProject.name="reproducer-base"
+include("backend")
+include("restapi")
+include("app")

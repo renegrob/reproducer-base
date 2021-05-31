@@ -17,7 +17,7 @@ public class ScheduledTask {
     @Inject
     StatelessRepo statelessRepo;
 
-    @Scheduled(every = "2m", concurrentExecution = SKIP)
+    @Scheduled(every = "2s", concurrentExecution = SKIP)
     public void task() {
         System.out.println("executing scheduled task...");
         statelessRepo.upsertApple();
