@@ -22,3 +22,10 @@ quarkus:
     second-level-caching-enabled: false
   resteasy:
     singleton-resources: true
+  swagger-ui:
+    always-include: true
+  http:
+    auth:
+      proactive: true
+    cors:
+      ~: true

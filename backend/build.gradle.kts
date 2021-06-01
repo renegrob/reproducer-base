@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     id("io.quarkus")
-    id("org.kordamp.gradle.jandex").version("0.10.0")
+    id("org.kordamp.gradle.jandex").version("0.9.0")
 }
 
 repositories {
@@ -18,8 +18,10 @@ val infinispanVersion: String by project
 dependencies {
     runtimeOnly("org.hsqldb:hsqldb:${hsqldbVersion}")
 
-    implementation(enforcedPlatform("org.infinispan:infinispan-bom:${infinispanVersion}"))
+    //implementation(enforcedPlatform("org.infinispan:infinispan-bom:${infinispanVersion}"))
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
+    jandex("org.jboss:jandex:2.2.3.Final")
+
     implementation("io.quarkus:quarkus-config-yaml")
     api("io.quarkus:quarkus-arc")
     api("io.quarkus:quarkus-scheduler:${quarkusPlatformVersion}");

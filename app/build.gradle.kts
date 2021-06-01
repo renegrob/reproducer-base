@@ -1,7 +1,7 @@
 plugins {
     java
     id("io.quarkus")
-    id("org.kordamp.gradle.jandex").version("0.10.0")
+    id("org.kordamp.gradle.jandex").version("0.9.0")
 }
 
 repositories {
@@ -18,12 +18,22 @@ val infinispanVersion: String by project
 dependencies {
     runtimeOnly("org.hsqldb:hsqldb:${hsqldbVersion}")
 
-    implementation(enforcedPlatform("org.infinispan:infinispan-bom:${infinispanVersion}"))
+    //implementation(enforcedPlatform("org.infinispan:infinispan-bom:${infinispanVersion}"))
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
+    jandex("org.jboss:jandex:2.2.3.Final")
+
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-smallrye-openapi:${quarkusPlatformVersion}")
     implementation("io.quarkus:quarkus-smallrye-health:${quarkusPlatformVersion}")
+
+//    implementation("io.quarkus:quarkus-smallrye-jwt:${quarkusPlatformVersion}")
+//    implementation("io.quarkus:quarkus-smallrye-jwt-build:${quarkusPlatformVersion}")
+
+    implementation("io.quarkus:quarkus-rest-client-jackson:${quarkusPlatformVersion}")
+
+    implementation("io.quarkus:quarkus-security:${quarkusPlatformVersion}")
+
     implementation(project(":backend"))
     implementation(project(":restapi"))
 }
