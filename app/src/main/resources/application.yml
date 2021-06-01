@@ -29,3 +29,8 @@ quarkus:
       proactive: true
     cors:
       ~: true
+  log:
+    min-level: TRACE
+    category:
+      'org.jboss.resteasy.resteasy_jaxrs.i18n':
+        level: TRACE
