@@ -1,5 +1,14 @@
-display:
-  mach: 3
-  unit:
-    name: "mph"
-    factor: 2.23694
+quarkus:
+  datasource:
+    db-kind: postgresql
+    devservices:
+      image-name: postgres:10.7
+      properties:
+        - prepareThreshold: 0
+        - preparedStatementCacheQueries: 0
+        - autosave: conservative
+  hibernate-orm:
+    log:
+      sql: true
+    database:
+      generation: drop-and-create

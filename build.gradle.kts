@@ -18,6 +18,9 @@ dependencies {
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-resteasy")
     implementation("io.quarkus:quarkus-resteasy-jackson")
+    implementation("io.quarkus:quarkus-jdbc-postgresql")
+    implementation("io.quarkus:quarkus-hibernate-orm-panache")
+
     //implementation("io.quarkus:quarkus-resteasy-qute")
     //implementation("io.quarkus:quarkus-rest-client")
     //implementation("io.quarkus:quarkus-rest-client-jackson")
@@ -26,6 +29,7 @@ dependencies {
     //implementation("io.quarkus:quarkus-spring-data-jpa")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
+    testImplementation("org.assertj:assertj-core:3.12.2")
 }
 
 group = "com.github.renegrob"
