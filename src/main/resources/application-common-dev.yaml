@@ -1,0 +1,13 @@
+quarkus:
+  datasource:
+    devservices:
+      image-name: postgres:10.7
+      properties:
+        - prepareThreshold: 0
+        - preparedStatementCacheQueries: 0
+        - autosave: conservative
+  hibernate-orm:
+    log:
+      sql: true
+  flyway:
+    migrate-at-start: true

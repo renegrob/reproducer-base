@@ -1,14 +1,32 @@
 quarkus:
   datasource:
     db-kind: postgresql
-    devservices:
-      image-name: postgres:10.7
-      properties:
-        - prepareThreshold: 0
-        - preparedStatementCacheQueries: 0
-        - autosave: conservative
   hibernate-orm:
     log:
       sql: true
-    database:
-      generation: drop-and-create
+  flyway:
+    schemas: quarkus
+    migrate-at-start: true
+
+'%dev':
+  quarkus:
+    config:
+      profile:
+        parent: 'common-dev'
+    datasource:
+      devservices:
+        port: 5433
+
+'%test':
+  quarkus:
+    config:
+      profile:
+        parent: 'common-dev'
+
+'%WithOther':
+  quarkus:
+    config:
+      profile:
+        parent: 'common-dev'
+    arc:
+      selected-alternatives: com.github.renegrob.service.MyServiceOtherImpl
