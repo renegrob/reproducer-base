@@ -3,3 +3,24 @@ display:
   unit:
     name: "mph"
     factor: 2.23694
+quarkus:
+  swagger-ui:
+    always-include: true
+    show-extensions: true
+    show-common-extensions: true
+
+  smallrye-openapi:
+    store-schema-directory: openapi
+    security-scheme: basic
+    security-scheme-name: demo
+    security-scheme-description: You login
+    auto-add-tags: true
+
+    openapi:
+      included: true
+mp:
+  openapi:
+    extensions:
+      smallrye:
+        operationIdStrategy: CLASS_METHOD
+    filter: com.github.renegrob.openapi.OpenApiFilter

@@ -3,9 +3,15 @@ plugins {
     id("io.quarkus")
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
+group = "com.github.renegrob"
+version = "1.0.0-SNAPSHOT"
+
+
+allprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
 }
 
 val quarkusPlatformGroupId: String by project
@@ -18,6 +24,9 @@ dependencies {
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-resteasy")
     implementation("io.quarkus:quarkus-resteasy-jackson")
+    implementation("io.quarkus:quarkus-smallrye-openapi")
+    implementation("io.quarkus:quarkus-smallrye-health")
+    implementation(project(":myext:runtime"))
     //implementation("io.quarkus:quarkus-resteasy-qute")
     //implementation("io.quarkus:quarkus-rest-client")
     //implementation("io.quarkus:quarkus-rest-client-jackson")
@@ -27,9 +36,6 @@ dependencies {
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
 }
-
-group = "com.github.renegrob"
-version = "1.0.0-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11

@@ -8,6 +8,10 @@ pluginManagement {
     }
     plugins {
         id(quarkusPluginId) version quarkusPluginVersion
+        id("io.quarkus.extension") version quarkusPluginVersion
     }
 }
 rootProject.name="reproducer-base"
+include(":myext")
+include(":myext:deployment")
+include(":myext:runtime")

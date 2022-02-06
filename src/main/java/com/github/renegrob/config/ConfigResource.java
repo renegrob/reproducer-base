@@ -9,6 +9,8 @@ import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import com.github.renegrob.myext.runtime.MyAnnotation;
+
 @Path("/config")
 public class ConfigResource {
 
@@ -24,6 +26,7 @@ public class ConfigResource {
     @ConfigProperty(name = "display.unit.factor")
     BigDecimal displayUnitFactor;
 
+    @MyAnnotation("Test2")
     @GET
     @Path("supersonic")
     @Produces(MediaType.TEXT_PLAIN)

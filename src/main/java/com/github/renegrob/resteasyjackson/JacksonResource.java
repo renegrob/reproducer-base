@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+import com.github.renegrob.myext.runtime.MyAnnotation;
+
 @Path("/resteasy-jackson/quarks")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -26,6 +28,7 @@ public class JacksonResource {
     }
 
     @POST
+    @MyAnnotation("Test1")
     public Set<Quark> add(Quark quark) {
         quarks.add(quark);
         return quarks;
