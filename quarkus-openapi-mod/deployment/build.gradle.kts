@@ -3,9 +3,6 @@ plugins {
     `maven-publish`
 }
 
-group = "com.github.renegrob.myext"
-version = "1.0.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }
@@ -19,7 +16,7 @@ dependencies {
     implementation("io.quarkus:quarkus-core-deployment")
     implementation("io.quarkus:quarkus-smallrye-openapi-deployment")
     implementation("com.google.guava:guava:31.0.1-jre")
-    implementation(project(":myext:runtime"))
+    implementation(project(":quarkus-openapi-mod:runtime"))
 }
 
 
@@ -27,7 +24,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             groupId = "${project.group}"
-            artifactId = "myext"
+            artifactId = "quarkus-openapi-mod"
             version = "${project.version}"
 
             from(components["java"])

@@ -3,9 +3,6 @@ plugins {
     id("io.quarkus.extension")
 }
 
-group = "com.github.renegrob.myext"
-version = "1.0.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }
@@ -15,8 +12,8 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 quarkusExtension {
-    //deploymentArtifact = "${project.group}:myext:${project.version}"
-    //deploymentArtifact = ":myext-deployment"
+    //deploymentArtifact = "${project.group}:quarkus-openapi-mod:${project.version}"
+    //deploymentArtifact = ":quarkus-openapi-mod-deployment"
     //dependencyConditions = listOf("io.quarkus:quarkus-smallrye-openapi")
 }
 

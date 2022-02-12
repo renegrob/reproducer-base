@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import com.github.renegrob.myext.runtime.MyAnnotation;
+import com.github.renegrob.io.quarkuverse.openapi.mod.runtime.MyAnnotation;
 
 @Path("/config")
 public class ConfigResource {

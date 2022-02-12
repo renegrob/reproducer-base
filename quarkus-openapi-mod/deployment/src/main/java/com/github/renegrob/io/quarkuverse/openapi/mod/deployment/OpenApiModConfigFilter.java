@@ -1,4 +1,4 @@
-package com.github.renegrob.myext.deployment;
+package com.github.renegrob.io.quarkuverse.openapi.mod.deployment;
 
 import java.util.List;
 import java.util.Map;
@@ -14,14 +14,14 @@ import com.google.common.base.Strings;
 
 import io.smallrye.openapi.api.models.OperationImpl;
 
-public class MyConfigFilter implements OASFilter {
+public class OpenApiModConfigFilter implements OASFilter {
 
     private Map<String, List<String>> methodReferences = Map.of();
 
-    public MyConfigFilter() {
+    public OpenApiModConfigFilter() {
     }
 
-    public MyConfigFilter(Map<String, List<String>> myAnnotationMethodReferences) {
+    public OpenApiModConfigFilter(Map<String, List<String>> myAnnotationMethodReferences) {
         this.methodReferences = myAnnotationMethodReferences;
     }
 
@@ -40,8 +40,8 @@ public class MyConfigFilter implements OASFilter {
                             for (Operation operation : operations.values()) {
 
                                 OperationImpl operationImpl = (OperationImpl) operation;
-
-                                if (methodReferences.keySet().contains(operationImpl.getMethodRef())) {
+                                if (methodReferences.containsKey(operationImpl.getMethodRef())) {
+                                    // TODO: use CDI to apply extra information
                                     List<String> values = methodReferences.get(operationImpl.getMethodRef());
                                     operation.setSummary(Strings.nullToEmpty(operation.getSummary()) + values);
                                 }

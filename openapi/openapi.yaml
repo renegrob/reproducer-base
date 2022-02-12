@@ -1,0 +1,136 @@
+---
+openapi: 3.0.3
+info:
+  title: Generated API
+  version: "1.0"
+paths:
+  /config/supersonic:
+    get:
+      tags:
+      - Config Resource
+      summary: "[Test2][Test2]"
+      operationId: ConfigResource_supersonic
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /hello-resteasy:
+    get:
+      tags:
+      - Greeting Resource
+      summary: Hello RESTEasy
+      description: '*italic* **bold** and normal text.'
+      operationId: GreetingResource_hello
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /resteasy-jackson/quarks:
+    get:
+      tags:
+      - Jackson Resource
+      operationId: JacksonResource_list
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quark'
+    post:
+      tags:
+      - Jackson Resource
+      summary: "[Test1][Test1]"
+      operationId: JacksonResource_add
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Quark'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quark'
+    delete:
+      tags:
+      - Jackson Resource
+      operationId: JacksonResource_delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Quark'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quark'
+  /resteasy-jackson/test/{parameter}:
+    get:
+      tags:
+      - Test Resource
+      operationId: TestResource_list
+      parameters:
+      - name: parameter
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-MyHeader
+        in: header
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      security:
+      - demo:
+        - Role1
+        - Role2
+      - demo:
+        - Role1
+        - Role2
+components:
+  schemas:
+    Quark:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+  securitySchemes:
+    demo:
+      type: http
+      description: You login
+      scheme: basic

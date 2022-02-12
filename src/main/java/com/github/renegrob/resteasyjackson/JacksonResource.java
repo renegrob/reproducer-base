@@ -1,12 +1,17 @@
 package com.github.renegrob.resteasyjackson;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-import com.github.renegrob.myext.runtime.MyAnnotation;
+import com.github.renegrob.io.quarkuverse.openapi.mod.runtime.MyAnnotation;
 
 @Path("/resteasy-jackson/quarks")
 @Produces(MediaType.APPLICATION_JSON)

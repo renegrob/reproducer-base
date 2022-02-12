@@ -26,7 +26,7 @@ dependencies {
     implementation("io.quarkus:quarkus-resteasy-jackson")
     implementation("io.quarkus:quarkus-smallrye-openapi")
     implementation("io.quarkus:quarkus-smallrye-health")
-    implementation(project(":myext:runtime"))
+    implementation(project(":quarkus-openapi-mod:runtime"))
     //implementation("io.quarkus:quarkus-resteasy-qute")
     //implementation("io.quarkus:quarkus-rest-client")
     //implementation("io.quarkus:quarkus-rest-client-jackson")

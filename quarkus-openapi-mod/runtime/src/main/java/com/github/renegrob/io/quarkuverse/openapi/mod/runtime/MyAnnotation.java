@@ -1,4 +1,4 @@
-package com.github.renegrob.myext.runtime;
+package com.github.renegrob.io.quarkuverse.openapi.mod.runtime;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

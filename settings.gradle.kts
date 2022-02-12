@@ -12,6 +12,6 @@ pluginManagement {
     }
 }
 rootProject.name="reproducer-base"
-include(":myext")
-include(":myext:deployment")
-include(":myext:runtime")
+include(":quarkus-openapi-mod")
+include(":quarkus-openapi-mod:deployment")
+include(":quarkus-openapi-mod:runtime")
