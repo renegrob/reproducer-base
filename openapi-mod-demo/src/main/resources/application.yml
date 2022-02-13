@@ -16,8 +16,15 @@ quarkus:
     security-scheme-description: You login
     auto-add-tags: true
 
-    openapi:
-      included: true
+#  health:
+#    openapi:
+#      included: true
+  openapi-mod:
+    annotations:
+      - "com.github.renegrob.MyDescription":
+          bean: "com.github.renegrob.ApplyDescription"
+          args:
+            - "*${value}*"
 mp:
   openapi:
     extensions:

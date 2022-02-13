@@ -1,14 +1,14 @@
 {
   "openapi" : "3.0.3",
   "info" : {
-    "title" : "Generated API",
-    "version" : "1.0"
+    "title" : "openapi-mod-demo API",
+    "version" : "1.0.0-SNAPSHOT"
   },
   "paths" : {
     "/config/supersonic" : {
       "get" : {
         "tags" : [ "Config Resource" ],
-        "summary" : "[Test2][Test2]",
+        "summary" : "[Test3][Test3]",
         "operationId" : "ConfigResource_supersonic",
         "responses" : {
           "200" : {

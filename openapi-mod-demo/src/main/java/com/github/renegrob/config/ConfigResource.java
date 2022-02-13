@@ -26,7 +26,7 @@ public class ConfigResource {
     @ConfigProperty(name = "display.unit.factor")
     BigDecimal displayUnitFactor;
 
-    @MyAnnotation("Test2")
+    @MyAnnotation("Test3")
     @GET
     @Path("supersonic")
     @Produces(MediaType.TEXT_PLAIN)

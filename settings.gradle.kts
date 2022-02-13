@@ -15,3 +15,4 @@ rootProject.name="reproducer-base"
 include(":quarkus-openapi-mod")
 include(":quarkus-openapi-mod:deployment")
 include(":quarkus-openapi-mod:runtime")
+include(":openapi-mod-demo")

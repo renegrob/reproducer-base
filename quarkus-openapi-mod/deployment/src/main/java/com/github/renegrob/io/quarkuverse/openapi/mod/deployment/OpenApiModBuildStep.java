@@ -17,14 +17,20 @@ import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.smallrye.openapi.deployment.OpenApiFilteredIndexViewBuildItem;
 import io.quarkus.smallrye.openapi.deployment.spi.AddToOpenAPIDefinitionBuildItem;
+import io.smallrye.common.expression.Expression;
 import io.smallrye.openapi.runtime.util.JandexUtil;
+
+import static io.smallrye.common.expression.Expression.Flag.GENERAL_EXPANSION;
+import static io.smallrye.common.expression.Expression.Flag.LENIENT_SYNTAX;
+import static io.smallrye.common.expression.Expression.Flag.NO_SMART_BRACES;
+import static io.smallrye.common.expression.Expression.Flag.NO_TRIM;
 
 public class OpenApiModBuildStep {
 
     public static final DotName MY_ANNOTATION = DotName.createSimple(MyAnnotation.class.getName());
 
     @BuildStep
-    void addMyFilter(BuildProducer<AddToOpenAPIDefinitionBuildItem> addToOpenAPIDefinitionProducer,
+    void addOpenApiModConfigFilter(BuildProducer<AddToOpenAPIDefinitionBuildItem> addToOpenAPIDefinitionProducer,
             OpenApiFilteredIndexViewBuildItem apiFilteredIndexViewBuildItem) {
 
         // TODO: Use CDI to configure or build-time properties
@@ -41,8 +47,10 @@ public class OpenApiModBuildStep {
 
     private Map<String, List<String>> getMyAnnotationMethodReferences(
             OpenApiFilteredIndexViewBuildItem apiFilteredIndexViewBuildItem) {
+        // TODO: Should we use a separate FilteredIndexView instance?
         List<AnnotationInstance> annotationInstances = new ArrayList<>();
         annotationInstances.addAll(apiFilteredIndexViewBuildItem.getIndex().getAnnotations(MY_ANNOTATION));
+        final Expression expression = Expression.compile("bla", NO_SMART_BRACES, GENERAL_EXPANSION);
         Map<String, List<String>> methodReferences = new HashMap<>();
         for (AnnotationInstance ai : annotationInstances) {
             if (ai.target().kind().equals(AnnotationTarget.Kind.METHOD)) {
