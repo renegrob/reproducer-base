@@ -11,59 +11,48 @@ import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.MethodInfo;
 
-import com.github.renegrob.io.quarkuverse.openapi.mod.runtime.MyAnnotation;
-
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.smallrye.openapi.deployment.OpenApiFilteredIndexViewBuildItem;
 import io.quarkus.smallrye.openapi.deployment.spi.AddToOpenAPIDefinitionBuildItem;
-import io.smallrye.common.expression.Expression;
 import io.smallrye.openapi.runtime.util.JandexUtil;
-
-import static io.smallrye.common.expression.Expression.Flag.GENERAL_EXPANSION;
-import static io.smallrye.common.expression.Expression.Flag.LENIENT_SYNTAX;
-import static io.smallrye.common.expression.Expression.Flag.NO_SMART_BRACES;
-import static io.smallrye.common.expression.Expression.Flag.NO_TRIM;
 
 public class OpenApiModBuildStep {
 
-    public static final DotName MY_ANNOTATION = DotName.createSimple(MyAnnotation.class.getName());
-
     @BuildStep
     void addOpenApiModConfigFilter(BuildProducer<AddToOpenAPIDefinitionBuildItem> addToOpenAPIDefinitionProducer,
-            OpenApiFilteredIndexViewBuildItem apiFilteredIndexViewBuildItem) {
+            OpenApiFilteredIndexViewBuildItem apiFilteredIndexViewBuildItem, OpenApiModConfig config) {
 
-        // TODO: Use CDI to configure or build-time properties
-        List<AnnotationInstance> annotationInstances = new ArrayList<>();
-        annotationInstances.addAll(apiFilteredIndexViewBuildItem.getIndex().getAnnotations(MY_ANNOTATION));
+        System.out.println("annotations: " + config.annotations);
 
-        final Map<String, List<String>> myAnnotationMethodReferences = getMyAnnotationMethodReferences(
-                apiFilteredIndexViewBuildItem);
+        final Map<String, AnnotationInstanceValues> myAnnotationMethodReferences = getMyAnnotationMethodReferences(
+                config, apiFilteredIndexViewBuildItem);
 
         addToOpenAPIDefinitionProducer.produce(
-                new AddToOpenAPIDefinitionBuildItem(new OpenApiModConfigFilter(myAnnotationMethodReferences)));
-
+                new AddToOpenAPIDefinitionBuildItem(new OpenApiModConfigFilter(config, myAnnotationMethodReferences)));
     }
 
-    private Map<String, List<String>> getMyAnnotationMethodReferences(
-            OpenApiFilteredIndexViewBuildItem apiFilteredIndexViewBuildItem) {
-        // TODO: Should we use a separate FilteredIndexView instance?
-        List<AnnotationInstance> annotationInstances = new ArrayList<>();
-        annotationInstances.addAll(apiFilteredIndexViewBuildItem.getIndex().getAnnotations(MY_ANNOTATION));
-        final Expression expression = Expression.compile("bla", NO_SMART_BRACES, GENERAL_EXPANSION);
-        Map<String, List<String>> methodReferences = new HashMap<>();
-        for (AnnotationInstance ai : annotationInstances) {
-            if (ai.target().kind().equals(AnnotationTarget.Kind.METHOD)) {
-                MethodInfo method = ai.target().asMethod();
-                String ref = JandexUtil.createUniqueMethodReference(method.declaringClass(), method);
-                methodReferences.put(ref, List.of(ai.value().asStringArray()));
-            }
-            if (ai.target().kind().equals(AnnotationTarget.Kind.CLASS)) {
-                ClassInfo classInfo = ai.target().asClass();
-                List<MethodInfo> methods = classInfo.methods();
-                for (MethodInfo method : methods) {
-                    String ref = JandexUtil.createUniqueMethodReference(classInfo, method);
-                    methodReferences.put(ref, List.of(ai.value().asStringArray()));
+    private Map<String, AnnotationInstanceValues> getMyAnnotationMethodReferences(
+            OpenApiModConfig config, OpenApiFilteredIndexViewBuildItem apiFilteredIndexViewBuildItem) {
+
+        Map<String, AnnotationInstanceValues> methodReferences = new HashMap<>();
+        for (String annotationName : config.annotations.keySet()) {
+            List<AnnotationInstance> annotationInstances = new ArrayList<>();
+            annotationInstances.addAll(apiFilteredIndexViewBuildItem.getIndex().getAnnotations(DotName.createSimple(annotationName)));
+            System.out.println("annotationInstances: " + annotationInstances);
+            for (AnnotationInstance ai : annotationInstances) {
+                if (ai.target().kind().equals(AnnotationTarget.Kind.METHOD)) {
+                    MethodInfo method = ai.target().asMethod();
+                    String ref = JandexUtil.createUniqueMethodReference(method.declaringClass(), method);
+                    methodReferences.computeIfAbsent(ref, k -> new AnnotationInstanceValues()).add(ai);
+                }
+                if (ai.target().kind().equals(AnnotationTarget.Kind.CLASS)) {
+                    ClassInfo classInfo = ai.target().asClass();
+                    List<MethodInfo> methods = classInfo.methods();
+                    for (MethodInfo method : methods) {
+                        String ref = JandexUtil.createUniqueMethodReference(classInfo, method);
+                        methodReferences.computeIfAbsent(ref, k -> new AnnotationInstanceValues()).add(ai);
+                    }
                 }
             }
         }

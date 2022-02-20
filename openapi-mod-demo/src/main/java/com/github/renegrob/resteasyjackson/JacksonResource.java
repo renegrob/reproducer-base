@@ -15,6 +15,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import com.github.renegrob.MyDescription;
 import com.github.renegrob.io.quarkuverse.openapi.mod.runtime.MyAnnotation;
 
 @Path("/resteasy-jackson/quarks")
@@ -31,6 +32,7 @@ public class JacksonResource {
         quarks.add(new Quark("???", null));
     }
 
+    @MyDescription(desc = "Custom Description")
     @GET
     public Set<Quark> list() {
         return quarks;

@@ -6,7 +6,7 @@ import io.quarkus.deployment.builditem.FeatureBuildItem;
 @SuppressWarnings("unused")
 class OpenApiModQuarkusExtProcessor {
 
-    private static final String FEATURE = "quarkus-openapi-mod-extension";
+    private static final String FEATURE = "quarkus-openapi-mod";
 
     @BuildStep
     FeatureBuildItem feature() {

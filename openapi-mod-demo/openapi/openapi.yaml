@@ -1,14 +1,13 @@
 ---
 openapi: 3.0.3
 info:
-  title: openapi-mod-demo API
-  version: 1.0.0-SNAPSHOT
+  title: Generated API
+  version: "1.0"
 paths:
   /config/supersonic:
     get:
       tags:
       - Config Resource
-      summary: "[Test3][Test3]"
       operationId: ConfigResource_supersonic
       responses:
         "200":
@@ -35,6 +34,7 @@ paths:
     get:
       tags:
       - Jackson Resource
+      description: '*Custom Description*'
       operationId: JacksonResource_list
       responses:
         "200":
@@ -49,7 +49,6 @@ paths:
     post:
       tags:
       - Jackson Resource
-      summary: "[Test1][Test1]"
       operationId: JacksonResource_add
       requestBody:
         content:

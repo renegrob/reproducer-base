@@ -21,10 +21,9 @@ quarkus:
 #      included: true
   openapi-mod:
     annotations:
-      - "com.github.renegrob.MyDescription":
-          bean: "com.github.renegrob.ApplyDescription"
-          args:
-            - "*${value}*"
+      "com.github.renegrob.MyDescription":
+        templates:
+          description: "*#{desc}*"
 mp:
   openapi:
     extensions:
