@@ -6,11 +6,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.media.Content;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-import com.github.renegrob.resteasyjackson.JacksonResource;
 
 @Path("/hello-resteasy")
 public class GreetingResource {
@@ -42,7 +37,7 @@ public class GreetingResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Hello RESTEasy", description = "*italic* **bold** and normal text.")
-    @MyAnnotation({"Test3", "Test4"})
+    @MyRequirePrivileges({"Test3", "Test4"})
     public String hello() {
         return "Hello RESTEasy";
     }

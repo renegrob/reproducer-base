@@ -11,9 +11,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.jboss.resteasy.reactive.RestHeader;
 import org.jboss.resteasy.reactive.RestPath;
-import com.github.renegrob.MyAnnotation;
+import com.github.renegrob.MyRequirePrivileges;
 import com.github.renegrob.MyDescription;
 import com.github.renegrob.MyDescriptionTable;
 import com.github.renegrob.MyExample;
@@ -48,7 +47,7 @@ public class JacksonResource {
     }
 
     @POST
-    @MyAnnotation("Test1")
+    @MyRequirePrivileges("Test1")
     public Set<Quark> add(Quark quark) {
         quarks.add(quark);
         return quarks;

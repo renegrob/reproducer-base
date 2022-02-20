@@ -18,7 +18,7 @@ quarkus:
     annotations:
       "com.github.renegrob.MySummary":
         summary: "#{value} #{oldValue}"
-      "com.github.renegrob.MyAnnotation":
+      "com.github.renegrob.MyRequirePrivileges":
         summary: "#{oldValue} requires: #{value}"
       "com.github.renegrob.MyDescription":
         description: "*#{desc}*"

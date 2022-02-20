@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface MyAnnotation {
+public @interface MyRequirePrivileges {
     String[] value();
 }
