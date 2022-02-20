@@ -21,9 +21,13 @@ quarkus:
 #      included: true
   openapi-mod:
     annotations:
+      "com.github.renegrob.MySummary":
+        summary: "#{value} #{oldValue}"
+      "com.github.renegrob.MyAnnotation":
+        summary: "#{oldValue} requires: #{value}"
       "com.github.renegrob.MyDescription":
-        templates:
-          description: "*#{desc}*"
+        description: "*#{desc}*"
+
 mp:
   openapi:
     extensions:

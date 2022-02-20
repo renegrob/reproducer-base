@@ -1,6 +1,7 @@
 package com.github.renegrob.io.quarkuverse.openapi.mod.deployment;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.jboss.jandex.AnnotationInstance;
@@ -9,7 +10,7 @@ import org.jboss.jandex.AnnotationValue;
 public class AnnotationInstanceValues {
 
     private String name;
-    private Map<String, String[]> valueMap = new HashMap<>();
+    private Map<String, String[]> valueMap = new LinkedHashMap<>();
 
     public void add(AnnotationInstance annotationInstance) {
         this.name = annotationInstance.name().toString();

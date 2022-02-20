@@ -8,6 +8,7 @@ paths:
     get:
       tags:
       - Config Resource
+      summary: "Supersonic requires: Test3, Test4"
       operationId: ConfigResource_supersonic
       responses:
         "200":
@@ -49,6 +50,7 @@ paths:
     post:
       tags:
       - Jackson Resource
+      summary: "requires: Test1"
       operationId: JacksonResource_add
       requestBody:
         content:

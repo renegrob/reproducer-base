@@ -1,15 +1,15 @@
 package com.github.renegrob.config;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
+import java.math.BigDecimal;
+import java.util.Optional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.math.BigDecimal;
-import java.util.Optional;
 
-import com.github.renegrob.io.quarkuverse.openapi.mod.runtime.MyAnnotation;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import com.github.renegrob.MyAnnotation;
+import com.github.renegrob.MySummary;
 
 @Path("/config")
 public class ConfigResource {
@@ -26,10 +26,11 @@ public class ConfigResource {
     @ConfigProperty(name = "display.unit.factor")
     BigDecimal displayUnitFactor;
 
-    @MyAnnotation("Test3")
     @GET
     @Path("supersonic")
     @Produces(MediaType.TEXT_PLAIN)
+    @MySummary("Supersonic")
+    @MyAnnotation({"Test3", "Test4"})
     public String supersonic() {
         final int mach = displayMach.orElse(1);
         final BigDecimal speed = BigDecimal.valueOf(speedOfSound)

@@ -3,6 +3,8 @@ package com.github.renegrob.io.quarkuverse.openapi.mod.deployment;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.eclipse.microprofile.openapi.OASFilter;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
@@ -11,6 +13,7 @@ import org.eclipse.microprofile.openapi.models.PathItem;
 import org.eclipse.microprofile.openapi.models.Paths;
 import com.google.common.base.Strings;
 
+import io.quarkus.runtime.util.StringUtil;
 import io.smallrye.common.expression.Expression;
 import io.smallrye.openapi.api.models.OperationImpl;
 
@@ -20,12 +23,13 @@ import static io.smallrye.common.expression.Expression.Flag.NO_SMART_BRACES;
 public class OpenApiModConfigFilter implements OASFilter {
 
     private OpenApiModConfig config = new OpenApiModConfig();
-    private Map<String, AnnotationInstanceValues> methodReferences = Map.of();
+    private Map<String, Map<String, AnnotationInstanceValues>> methodReferences = Map.of();
+    private OpenAPI appliedTo;
 
     public OpenApiModConfigFilter() {
     }
 
-    public OpenApiModConfigFilter(OpenApiModConfig config, Map<String, AnnotationInstanceValues> myAnnotationMethodReferences) {
+    public OpenApiModConfigFilter(OpenApiModConfig config, Map<String, Map<String, AnnotationInstanceValues>> myAnnotationMethodReferences) {
         this.config = config;
         this.methodReferences = myAnnotationMethodReferences;
     }
@@ -33,6 +37,11 @@ public class OpenApiModConfigFilter implements OASFilter {
     @Override
     public void filterOpenAPI(OpenAPI openAPI) {
         if (!methodReferences.isEmpty()) {
+            if (appliedTo == openAPI) {
+                return;
+            }
+            appliedTo = openAPI;
+            System.out.println("Apply filter: " + this);
             Paths paths = openAPI.getPaths();
             if (paths != null) {
                 Map<String, PathItem> pathItems = paths.getPathItems();
@@ -46,27 +55,22 @@ public class OpenApiModConfigFilter implements OASFilter {
 
                                 OperationImpl operationImpl = (OperationImpl) operation;
                                 if (methodReferences.containsKey(operationImpl.getMethodRef())) {
-                                    AnnotationInstanceValues aiv = methodReferences.get(operationImpl.getMethodRef());
-                                    final OpenApiModConfig.OATemplates oaTemplates = config.annotations.get(aiv.getName());
-                                    for (Map.Entry<String, String> template : oaTemplates.templates.entrySet()) {
+                                    final Map<String, AnnotationInstanceValues> annotationInstances = methodReferences.get(
+                                            operationImpl.getMethodRef());
+                                    for (Map.Entry<String, AnnotationInstanceValues> entry: annotationInstances.entrySet()) {
+                                        final OpenApiModConfig.OATemplates oaTemplates = config.annotations.get(entry.getKey());
 
-                                        OASOperationAttribute operationAttribute = OASOperationAttribute.parseCamelCase(template.getKey());
-                                        final Expression expression = createExpression(template);
-
-                                        switch (operationAttribute) {
-                                            case OPERATION_ID:
-                                                operation.setOperationId(applyTemplate(expression, aiv, operation.getOperationId()));
-                                                break;
-                                            case SUMMARY:
-                                                operation.setSummary(applyTemplate(expression, aiv, operation.getSummary()));
-                                                break;
-                                            case DESCRIPTION:
-                                                operation.setDescription(applyTemplate(expression, aiv, operation.getDescription()));
-                                                break;
-                                        }
-                                        // System.out.println(((OperationImpl) operation).getMethodRef() + " -> "+ template.getKey() + template.getValue());
+                                        applyTempate(oaTemplates.operationId, operation::setOperationId,
+                                                operation::getOperationId,
+                                                entry.getValue());
+                                        applyTempate(oaTemplates.summary, operation::setSummary, operation::getSummary,
+                                                entry.getValue());
+                                        applyTempate(oaTemplates.description, operation::setDescription,
+                                                operation::getDescription,
+                                                entry.getValue());
                                     }
                                 }
+                                // System.out.println(((OperationImpl) operation).getMethodRef() + " -> "+ template.getKey() + template.getValue());
                             }
                         }
                     }
@@ -75,16 +79,23 @@ public class OpenApiModConfigFilter implements OASFilter {
         }
     }
 
-    private Expression createExpression(Map.Entry<String, String> template) {
-        return Expression.compile(template.getValue().replace("#{", "${"), NO_SMART_BRACES,
+
+    private Expression createExpression(String template) {
+        return Expression.compile(template.replace("#{", "${"), NO_SMART_BRACES,
                 GENERAL_EXPANSION);
     }
 
-    private String applyTemplate(Expression template, AnnotationInstanceValues aiv, String oldValue) {
-        final String oldValueOrEmpty = Strings.nullToEmpty(oldValue);
-        return template.evaluate((c, b) -> {
+    private void applyTempate(String template, Consumer<String> set, Supplier<String> getOldValue,
+            AnnotationInstanceValues aiv) {
+        if (template.equals(OpenApiModConfig.EMPTY)) {
+            return;
+        }
+        final Expression expression = createExpression(template);
+
+        final String oldValue = Strings.nullToEmpty(getOldValue.get());
+        String result = expression.evaluate((c, b) -> {
             if ("oldValue".equals(c.getKey())) {
-                b.append(oldValueOrEmpty);
+                b.append(oldValue);
                 return;
             }
             final String[] values = aiv.getValueMap().get(c.getKey());
@@ -97,5 +108,6 @@ public class OpenApiModConfigFilter implements OASFilter {
                 b.append(String.join(", ", values));
             }
         });
+        set.accept(result.trim());
     }
 }

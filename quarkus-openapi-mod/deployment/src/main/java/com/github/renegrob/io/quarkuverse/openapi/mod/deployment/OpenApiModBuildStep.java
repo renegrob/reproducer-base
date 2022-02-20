@@ -2,6 +2,7 @@ package com.github.renegrob.io.quarkuverse.openapi.mod.deployment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,33 +26,34 @@ public class OpenApiModBuildStep {
 
         System.out.println("annotations: " + config.annotations);
 
-        final Map<String, AnnotationInstanceValues> myAnnotationMethodReferences = getMyAnnotationMethodReferences(
+        final Map<String, Map<String, AnnotationInstanceValues>> myAnnotationMethodReferences = getMyAnnotationMethodReferences(
                 config, apiFilteredIndexViewBuildItem);
 
         addToOpenAPIDefinitionProducer.produce(
                 new AddToOpenAPIDefinitionBuildItem(new OpenApiModConfigFilter(config, myAnnotationMethodReferences)));
     }
 
-    private Map<String, AnnotationInstanceValues> getMyAnnotationMethodReferences(
+    private Map<String, Map<String, AnnotationInstanceValues>> getMyAnnotationMethodReferences(
             OpenApiModConfig config, OpenApiFilteredIndexViewBuildItem apiFilteredIndexViewBuildItem) {
 
-        Map<String, AnnotationInstanceValues> methodReferences = new HashMap<>();
+        Map<String, Map<String, AnnotationInstanceValues>> methodReferences = new LinkedHashMap<>();
         for (String annotationName : config.annotations.keySet()) {
             List<AnnotationInstance> annotationInstances = new ArrayList<>();
             annotationInstances.addAll(apiFilteredIndexViewBuildItem.getIndex().getAnnotations(DotName.createSimple(annotationName)));
-            System.out.println("annotationInstances: " + annotationInstances);
             for (AnnotationInstance ai : annotationInstances) {
                 if (ai.target().kind().equals(AnnotationTarget.Kind.METHOD)) {
                     MethodInfo method = ai.target().asMethod();
                     String ref = JandexUtil.createUniqueMethodReference(method.declaringClass(), method);
-                    methodReferences.computeIfAbsent(ref, k -> new AnnotationInstanceValues()).add(ai);
+                    //System.out.println(String.format("method annotationInstance: %s -> %s", ref, ai));
+                    methodReferences.computeIfAbsent(ref, k -> new LinkedHashMap<>()).computeIfAbsent(ai.name().toString(), n -> new AnnotationInstanceValues()).add(ai);
                 }
                 if (ai.target().kind().equals(AnnotationTarget.Kind.CLASS)) {
                     ClassInfo classInfo = ai.target().asClass();
                     List<MethodInfo> methods = classInfo.methods();
                     for (MethodInfo method : methods) {
                         String ref = JandexUtil.createUniqueMethodReference(classInfo, method);
-                        methodReferences.computeIfAbsent(ref, k -> new AnnotationInstanceValues()).add(ai);
+                        //System.out.println(String.format("class annotationInstance: %s -> %s", ref, ai));
+                        methodReferences.computeIfAbsent(ref, k -> new LinkedHashMap<>()).computeIfAbsent(ai.name().toString(), n -> new AnnotationInstanceValues()).add(ai);
                     }
                 }
             }

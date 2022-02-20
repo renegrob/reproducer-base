@@ -1,6 +1,5 @@
 package com.github.renegrob.io.quarkuverse.openapi.mod.deployment;
 
-import java.util.List;
 import java.util.Map;
 
 import io.quarkus.runtime.annotations.ConfigGroup;
@@ -11,18 +10,27 @@ import io.quarkus.runtime.annotations.ConfigRoot;
 @ConfigRoot(name = "openapi-mod", phase = ConfigPhase.BUILD_TIME)
 public class OpenApiModConfig {
 
+    final static String EMPTY = "com.github.renegrob.io.quarkuverse.openapi.mod.deployment.empty-value";
+
     @ConfigGroup
     public static class OATemplates {
         /**
          * templates
          */
-        @ConfigItem
-        Map<String, String> templates;
+        @ConfigItem(defaultValue = EMPTY)
+        String operationId;
 
-        @Override
-        public String toString() {
-            return String.valueOf(templates);
-        }
+        /**
+         * templates
+         */
+        @ConfigItem(defaultValue = EMPTY)
+        String description;
+
+        /**
+         * templates
+         */
+        @ConfigItem(defaultValue = EMPTY)
+        String summary;
     }
 
     /**
