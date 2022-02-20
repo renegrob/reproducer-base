@@ -42,6 +42,7 @@ public class GreetingResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Hello RESTEasy", description = "*italic* **bold** and normal text.")
+    @MyAnnotation({"Test3", "Test4"})
     public String hello() {
         return "Hello RESTEasy";
     }

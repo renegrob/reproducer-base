@@ -4,24 +4,11 @@ info:
   title: Generated API
   version: "1.0"
 paths:
-  /config/supersonic:
-    get:
-      tags:
-      - Config Resource
-      summary: "Supersonic requires: Test3, Test4"
-      operationId: ConfigResource_supersonic
-      responses:
-        "200":
-          description: OK
-          content:
-            text/plain:
-              schema:
-                type: string
   /hello-resteasy:
     get:
       tags:
       - Greeting Resource
-      summary: Hello RESTEasy
+      summary: "Hello RESTEasy requires: Test3, Test4"
       description: '*italic* **bold** and normal text.'
       operationId: GreetingResource_hello
       responses:
@@ -86,6 +73,24 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Quark'
+  /resteasy-jackson/quarks/{name}:
+    get:
+      tags:
+      - Jackson Resource
+      operationId: JacksonResource_getByName
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quark'
   /resteasy-jackson/test/{parameter}:
     get:
       tags:

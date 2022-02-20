@@ -11,10 +11,12 @@ import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.Operation;
 import org.eclipse.microprofile.openapi.models.PathItem;
 import org.eclipse.microprofile.openapi.models.Paths;
+import com.github.renegrob.io.quarkuverse.openapi.mod.deployment.MethodAnnotations.AnnotationInstanceValues;
 import com.google.common.base.Strings;
 
 import io.smallrye.common.expression.Expression;
 import io.smallrye.openapi.api.models.OperationImpl;
+import io.smallrye.openapi.api.models.parameters.ParameterImpl;
 
 import static io.smallrye.common.expression.Expression.Flag.GENERAL_EXPANSION;
 import static io.smallrye.common.expression.Expression.Flag.NO_SMART_BRACES;
@@ -22,20 +24,20 @@ import static io.smallrye.common.expression.Expression.Flag.NO_SMART_BRACES;
 public class OpenApiModConfigFilter implements OASFilter {
 
     private OpenApiModConfig config = new OpenApiModConfig();
-    private Map<String, Map<String, AnnotationInstanceValues>> methodReferences = Map.of();
+    private MethodAnnotations methodAnnotations = new MethodAnnotations();
     private OpenAPI appliedTo;
 
     public OpenApiModConfigFilter() {
     }
 
-    public OpenApiModConfigFilter(OpenApiModConfig config, Map<String, Map<String, AnnotationInstanceValues>> myAnnotationMethodReferences) {
+    public OpenApiModConfigFilter(OpenApiModConfig config, MethodAnnotations methodAnnotations) {
         this.config = config;
-        this.methodReferences = myAnnotationMethodReferences;
+        this.methodAnnotations = methodAnnotations;
     }
 
     @Override
     public void filterOpenAPI(OpenAPI openAPI) {
-        if (!methodReferences.isEmpty()) {
+        if (!methodAnnotations.isEmpty()) {
             if (appliedTo == openAPI) {
                 return;
             }
@@ -53,22 +55,24 @@ public class OpenApiModConfigFilter implements OASFilter {
                             for (Operation operation : operations.values()) {
 
                                 OperationImpl operationImpl = (OperationImpl) operation;
-                                if (methodReferences.containsKey(operationImpl.getMethodRef())) {
-                                    final Map<String, AnnotationInstanceValues> annotationInstances = methodReferences.get(
-                                            operationImpl.getMethodRef());
-                                    for (Map.Entry<String, AnnotationInstanceValues> entry: annotationInstances.entrySet()) {
-                                        final OpenApiModConfig.OATemplates oaTemplates = config.annotations.get(entry.getKey());
+                                final MethodAnnotations.AnnotationInstances annotationInstances = methodAnnotations.forMethod(
+                                        operationImpl.getMethodRef());
+                                if (annotationInstances != null) {
+                                    for (AnnotationInstanceValues aiv: annotationInstances.values()) {
+                                        final OpenApiModConfig.OATemplates oaTemplates = config.annotations.get(aiv.getName());
 
-                                        applyTempate(oaTemplates.operationId, operation::setOperationId,
+                                        applyTemplate(oaTemplates.operationId, operation::setOperationId,
                                                     operation::getOperationId,
-                                                    entry.getValue());
-                                        applyTempate(oaTemplates.summary, operation::setSummary, operation::getSummary,
-                                                entry.getValue());
-                                        applyTempate(oaTemplates.description, operation::setDescription,
+                                                    aiv);
+                                        applyTemplate(oaTemplates.summary, operation::setSummary, operation::getSummary,
+                                                aiv);
+                                        applyTemplate(oaTemplates.description, operation::setDescription,
                                                 operation::getDescription,
-                                                entry.getValue());
+                                                aiv);
                                     }
                                 }
+
+                                // operation.getParameters().get(0).
                                 // System.out.println(((OperationImpl) operation).getMethodRef() + " -> "+ template.getKey() + template.getValue());
                             }
                         }
@@ -84,7 +88,7 @@ public class OpenApiModConfigFilter implements OASFilter {
                 GENERAL_EXPANSION);
     }
 
-    private void applyTempate(Optional<String> template, Consumer<String> set, Supplier<String> getOldValue,
+    private void applyTemplate(Optional<String> template, Consumer<String> set, Supplier<String> getOldValue,
             AnnotationInstanceValues aiv) {
         if (template.isEmpty()) {
             return;
@@ -97,7 +101,7 @@ public class OpenApiModConfigFilter implements OASFilter {
                 b.append(oldValue);
                 return;
             }
-            final String[] values = aiv.getValueMap().get(c.getKey());
+            final String[] values = aiv.asMap().get(c.getKey());
             if (values == null || values.length == 0) {
                 if (!c.hasDefault()) {
                     throw new IllegalStateException(String.format("Unresolved variable: %s", c.getKey()));

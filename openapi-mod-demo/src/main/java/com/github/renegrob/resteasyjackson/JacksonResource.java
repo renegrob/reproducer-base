@@ -11,8 +11,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import com.github.renegrob.MyDescription;
+import org.jboss.resteasy.reactive.RestHeader;
+import org.jboss.resteasy.reactive.RestPath;
 import com.github.renegrob.MyAnnotation;
+import com.github.renegrob.MyDescription;
+import com.github.renegrob.MyDescriptionTable;
+import com.github.renegrob.MyExample;
+import com.github.renegrob.MyJsonResponse;
+import com.github.renegrob.MyTableRow;
 
 @Path("/resteasy-jackson/quarks")
 @Produces(MediaType.APPLICATION_JSON)
@@ -34,6 +40,13 @@ public class JacksonResource {
         return quarks;
     }
 
+    @GET
+    @Path("{name}")
+    @MyJsonResponse(responseCode = "404", description = "Name not found.")
+    public Quark getByName(@RestPath @MyExample("Up") String name) {
+        return quarks.stream().filter(q -> q.name.equals(name)).findFirst().orElse(null);
+    }
+
     @POST
     @MyAnnotation("Test1")
     public Set<Quark> add(Quark quark) {
@@ -42,6 +55,11 @@ public class JacksonResource {
     }
 
     @DELETE
+    @MyDescriptionTable(rows = {
+            @MyTableRow(cols = { "Key1", "value1" }),
+            @MyTableRow(cols = { "Key2", "value2" }),
+            @MyTableRow(cols = { "Key3", "value3" })
+    })
     public Set<Quark> delete(Quark quark) {
         quarks.removeIf(existingQuark -> existingQuark.name.contentEquals(quark.name));
         return quarks;
