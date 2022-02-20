@@ -1,7 +1,7 @@
 package com.github.renegrob.io.quarkuverse.openapi.mod.deployment;
 
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -13,7 +13,6 @@ import org.eclipse.microprofile.openapi.models.PathItem;
 import org.eclipse.microprofile.openapi.models.Paths;
 import com.google.common.base.Strings;
 
-import io.quarkus.runtime.util.StringUtil;
 import io.smallrye.common.expression.Expression;
 import io.smallrye.openapi.api.models.OperationImpl;
 
@@ -61,8 +60,8 @@ public class OpenApiModConfigFilter implements OASFilter {
                                         final OpenApiModConfig.OATemplates oaTemplates = config.annotations.get(entry.getKey());
 
                                         applyTempate(oaTemplates.operationId, operation::setOperationId,
-                                                operation::getOperationId,
-                                                entry.getValue());
+                                                    operation::getOperationId,
+                                                    entry.getValue());
                                         applyTempate(oaTemplates.summary, operation::setSummary, operation::getSummary,
                                                 entry.getValue());
                                         applyTempate(oaTemplates.description, operation::setDescription,
@@ -85,12 +84,12 @@ public class OpenApiModConfigFilter implements OASFilter {
                 GENERAL_EXPANSION);
     }
 
-    private void applyTempate(String template, Consumer<String> set, Supplier<String> getOldValue,
+    private void applyTempate(Optional<String> template, Consumer<String> set, Supplier<String> getOldValue,
             AnnotationInstanceValues aiv) {
-        if (template.equals(OpenApiModConfig.EMPTY)) {
+        if (template.isEmpty()) {
             return;
         }
-        final Expression expression = createExpression(template);
+        final Expression expression = createExpression(template.get());
 
         final String oldValue = Strings.nullToEmpty(getOldValue.get());
         String result = expression.evaluate((c, b) -> {
