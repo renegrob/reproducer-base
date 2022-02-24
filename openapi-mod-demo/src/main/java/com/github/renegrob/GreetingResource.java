@@ -14,7 +14,7 @@ public class GreetingResource {
       components = @Components(
     parameters = {
       @Parameter(name = "application", in = QUERY, description = "Name of the application", required = true),
-      @Parameter(name = "accountAddress", in = PATH, description = "Address of account", example = ADDRESS_EXAMPLE, required = true)
+      @Parameter(name = "address", in = PATH, description = "address", example = ADDRESS_EXAMPLE, required = true)
     },
     responses = {
       @APIResponse(name = "NotFound", responseCode = HTTP_NOT_FOUND, description = "Account not found",

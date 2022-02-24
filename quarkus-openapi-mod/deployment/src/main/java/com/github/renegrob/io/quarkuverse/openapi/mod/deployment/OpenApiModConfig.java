@@ -3,8 +3,6 @@ package com.github.renegrob.io.quarkuverse.openapi.mod.deployment;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.swing.text.html.Option;
-
 import io.quarkus.runtime.annotations.ConfigGroup;
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
@@ -14,29 +12,63 @@ import io.quarkus.runtime.annotations.ConfigRoot;
 public class OpenApiModConfig {
 
     @ConfigGroup
-    public static class OATemplates {
+    public static class OAMOperationTemplate {
         /**
-         * templates
+         * operationId
          */
         @ConfigItem
         Optional<String> operationId;
 
         /**
-         * templates
+         * description
          */
         @ConfigItem
         Optional<String> description;
 
         /**
-         * templates
+         * summary
          */
         @ConfigItem
         Optional<String> summary;
     }
 
+    @ConfigGroup
+    public static class OAMParameterTemplate {
+        /**
+         * required
+         */
+        @ConfigItem
+        Optional<String> required;
+
+        /**
+         * description
+         */
+        @ConfigItem
+        Optional<String> description;
+
+        /**
+         * summary
+         */
+        @ConfigItem
+        Optional<String> summary;
+
+        /**
+         * exmaple
+         */
+        @ConfigItem
+        Optional<String> example;
+    }
+
     /**
-     * annotations
+     * methodAnnotations
      */
     @ConfigItem
-    Map<String, OATemplates> annotations;
+    Map<String, OAMOperationTemplate> methodAnnotations;
+
+    /**
+     * parameterAnnotations
+     */
+    @ConfigItem
+    Map<String, OAMParameterTemplate> parameterAnnotations;
+
 }

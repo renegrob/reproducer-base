@@ -11,6 +11,15 @@ pluginManagement {
         id("io.quarkus.extension") version quarkusPluginVersion
     }
 }
+
+dependencyResolutionManagement {
+    repositories {
+        repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+        mavenLocal()
+        mavenCentral ()
+    }
+}
+
 rootProject.name="reproducer-base"
 include(":quarkus-openapi-mod")
 include(":quarkus-openapi-mod:deployment")

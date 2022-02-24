@@ -15,13 +15,25 @@ quarkus:
 #    openapi:
 #      included: true
   openapi-mod:
-    annotations:
+    method-annotations:
+      ".*":
+        operationId: "#{className}_#{methodName}"
       "com.github.renegrob.MySummary":
         summary: "#{value} #{oldValue}"
+        # pattern: "(.*)"
       "com.github.renegrob.MyRequirePrivileges":
         summary: "#{oldValue} requires: #{value}"
+        # pattern: "(.*)"
       "com.github.renegrob.MyDescription":
         description: "*#{desc}*"
+    parameter-annotations:
+      "com.github.renegrob.MyDescription":
+        description: "*#{desc}*"
+      "com.github.renegrob.MyExample":
+        example: "#{value}"
+      "io.smallrye.common.constraint.NotNull":
+        required: "true"
+
 
 mp:
   openapi:

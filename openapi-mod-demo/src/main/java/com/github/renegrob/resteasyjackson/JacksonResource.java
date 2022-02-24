@@ -12,12 +12,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.reactive.RestPath;
-import com.github.renegrob.MyRequirePrivileges;
 import com.github.renegrob.MyDescription;
 import com.github.renegrob.MyDescriptionTable;
 import com.github.renegrob.MyExample;
 import com.github.renegrob.MyJsonResponse;
+import com.github.renegrob.MyRequirePrivileges;
 import com.github.renegrob.MyTableRow;
+
+import io.smallrye.common.constraint.NotNull;
+import io.smallrye.common.constraint.Nullable;
 
 @Path("/resteasy-jackson/quarks")
 @Produces(MediaType.APPLICATION_JSON)
@@ -35,6 +38,7 @@ public class JacksonResource {
 
     @MyDescription(desc = "Custom Description")
     @GET
+    // @SecurityScheme(scheme = "bearerAuth", securitySchemeName = "Authorization", in = SecuritySchemeIn.HEADER, type = SecuritySchemeType.HTTP, bearerFormat = "opaque")
     public Set<Quark> list() {
         return quarks;
     }
@@ -42,7 +46,7 @@ public class JacksonResource {
     @GET
     @Path("{name}")
     @MyJsonResponse(responseCode = "404", description = "Name not found.")
-    public Quark getByName(@RestPath @MyExample("Up") String name) {
+    public Quark getByName(@RestPath @MyExample("Up") @MyDescription(desc = "The name of the quark.") String name) {
         return quarks.stream().filter(q -> q.name.equals(name)).findFirst().orElse(null);
     }
 

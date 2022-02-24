@@ -81,9 +81,11 @@ paths:
       parameters:
       - name: name
         in: path
+        description: '*The name of the quark.*'
         required: true
         schema:
           type: string
+        example: Up
       responses:
         "200":
           description: OK
@@ -104,6 +106,7 @@ paths:
           type: string
       - name: X-MyHeader
         in: header
+        description: '*bla*'
         schema:
           type: string
       responses:
@@ -126,6 +129,35 @@ paths:
       - demo:
         - Role1
         - Role2
+    post:
+      tags:
+      - Test Resource
+      operationId: TestResource_list2
+      parameters:
+      - name: parameter
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-MyHeader
+        in: header
+        description: '*bla*'
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Quark'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
 components:
   schemas:
     Quark:

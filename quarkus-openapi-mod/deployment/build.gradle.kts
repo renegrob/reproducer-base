@@ -6,10 +6,6 @@ plugins {
 group = "com.github.renegrob.quarkus-openapi-mod"
 version = "1.0.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
-
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
@@ -20,7 +16,12 @@ dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-core")
     implementation("io.quarkus:quarkus-core-deployment")
-    implementation("io.quarkus:quarkus-smallrye-openapi-deployment")
+    implementation("io.quarkus:quarkus-smallrye-openapi-deployment:2.1.21-SNAPSHOT")
+    /*
+    constraints {
+        implementation("io.quarkus:quarkus-smallrye-openapi-deployment:2.1.21-SNAPSHOT") {
+    }
+     */
     implementation("io.smallrye.common:smallrye-common-expression")
 
     implementation(project(":quarkus-openapi-mod:runtime"))
