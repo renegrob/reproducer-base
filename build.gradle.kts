@@ -18,6 +18,7 @@ dependencies {
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-resteasy")
     implementation("io.quarkus:quarkus-resteasy-jackson")
+    //implementation("io.quarkus:quarkus-smallrye-openapi")
     //implementation("io.quarkus:quarkus-resteasy-qute")
     //implementation("io.quarkus:quarkus-rest-client")
     //implementation("io.quarkus:quarkus-rest-client-jackson")
