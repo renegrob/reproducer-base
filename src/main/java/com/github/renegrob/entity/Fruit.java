@@ -1,6 +1,6 @@
 package com.github.renegrob.entity;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import com.github.renegrob.INamedEntity;
 
